@@ -174,12 +174,13 @@ set architecture i386
     x /20i $pc
     set architecture i386  
 ```
+
 所得到的汇编代码为：
 ```
     ----------------
     IN: 
-    0x00007c00:  cli    
-    0x00007c01:  cld    
+    0x00007c00:  cli 
+    0x00007c01:  cld 
     0x00007c02:  xor    %ax,%ax
     0x00007c04:  mov    %ax,%ds
     0x00007c06:  mov    %ax,%es
@@ -243,6 +244,7 @@ set architecture i386
     IN: 
     0x00007cd1:  push   %ebp
 ```
+
 其与bootasm.S和bootblock.asm中的代码相同。
 
 
@@ -273,6 +275,7 @@ set architecture i386
 
 > 从`%cs=0 $pc=0x7c00`，进入后,
 首先清理寄存器
+
 ```
     .code16
 	    cli
@@ -283,12 +286,14 @@ set architecture i386
 	    movw %ax, %ss
 ```
 然后是使能A20 gate。之所以要开启A20,是因为为了访问高地址，必须打开，否则即便在保护模式下，也只能访问奇数兆的内存地址。而为了开启A20,必须通过IO操作，向键盘控制器8042发送一个命令，然后8042会将它的某个输出引脚的输出置为高电平，作为A20地址控制线的输入。具体操作是通过向端口64h发送命令，在60h读写完成的。整个开启的步骤为：
+
 ```
     1.等待8042的Input Buffer为空
     2.发送Write 8042 Output Buffer(P2)命令到8042 Input Buffer
     3.等待8042的Input Buffer为空
     4.将8042 Output Port(P2)得到字节的第2位置1,然后写入8042 Input Bufffer
 ```
+
 在bootasm.S中的实现为：
 ```
     seta20.1:
@@ -491,7 +496,7 @@ static struct gatedesc idt[256] = {{0}};
 > 在trap_dispatch的时钟中断处理例程中，按照每100个ticks打印一次ticks，简单调用print_ticks即可。
 
 
-## [扩展练习]Challenge 1
+## [扩展练习]Challenge 1（是按照答案实现的，对其中的解释都理解了，只是做前不知道怎么设置cs,ds,es,ss等寄存器，怎么切换堆栈）
 增加syscall功能，即增加一用户态函数（可执行一特定系统调用：获得时钟计数值），
 当内核初始完毕后，可从内核态返回到用户态的函数，而用户态的函数又通过系统调用得到内核态的服务
 
